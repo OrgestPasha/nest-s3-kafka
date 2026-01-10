@@ -24,15 +24,20 @@ export class FileService {
       mimetype,
     );
     const assetId = key;
-    const endpoint = process.env.MINIO_PUBLIC_URL;
+    const endpoint = process.env.MINIO_PUBLIC_URL || 'http://localhost:9000';
     const bucket = process.env.MINIO_BUCKET || 'uploads';
-    const url = `${endpoint}/${bucket}/${key}`;
+    const encodedKey = key
+      .split('/')
+      .map((part) => encodeURIComponent(part))
+      .join('/');
+    const url = `${endpoint}/${bucket}/${encodedKey}`;
     const event: FileUploadedEvent = {
       entryId,
       assetId,
       key,
       originalname: filename,
       uploadedAt: new Date().toISOString(),
+      url,
     };
 
     await this.kafka.publishFileUploaded(event);

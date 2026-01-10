@@ -16,8 +16,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { FileService } from './file.service';
 import express, { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { ApiTags, ApiConsumes, ApiBody, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiConsumes,
+  ApiBody,
+  ApiBearerAuth,
+  ApiResponse,
+} from '@nestjs/swagger';
 import { JwtPayload } from '../auth/jwt.strategy';
+import { FileUploadResponseDto } from './dto/file-upload.dto';
 
 @ApiTags('files')
 @ApiBearerAuth()
@@ -39,6 +46,11 @@ export class FileController {
         },
       },
     },
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'The file has been successfully uploaded.',
+    type: FileUploadResponseDto,
   })
   @UseInterceptors(FileInterceptor('file'))
   async upload(
@@ -73,6 +85,18 @@ export class FileController {
   }
 
   @Get(':key')
+  @ApiResponse({
+    status: 200,
+    description: 'The file stream',
+    content: {
+      'application/octet-stream': {
+        schema: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   async getFile(@Param('key') key: string, @Res() res: express.Response) {
     try {
       const stream = await this.fileService.getFile(key);

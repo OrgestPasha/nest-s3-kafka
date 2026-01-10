@@ -39,7 +39,10 @@ export class StorageService implements OnModuleInit {
   }
 
   private sanitizeFilename(filename: string) {
-    return filename.replaceAll('/', '_').replaceAll('\\', '_');
+    return filename
+      .replaceAll('/', '_')
+      .replaceAll('\\', '_')
+      .replaceAll(' ', '_');
   }
 
   async uploadFile(

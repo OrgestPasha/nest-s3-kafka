@@ -9,6 +9,7 @@ export interface FileUploadedEvent {
   key: string;
   originalname: string;
   uploadedAt: string;
+  url: string;
 }
 
 @Injectable()

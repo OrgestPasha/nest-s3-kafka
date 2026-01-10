@@ -8,9 +8,10 @@ import {
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { AssetsService } from './assets.service';
-import { ApiTags, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
+import { ApiTags, ApiBearerAuth, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 import { JwtPayload } from '../auth/jwt.strategy';
+import { AssetsResponseDto } from './dto/asset.dto';
 
 @ApiTags('assets')
 @ApiBearerAuth()
@@ -22,6 +23,11 @@ export class AssetsController {
   @Get()
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'pageSize', required: false, type: Number })
+  @ApiResponse({
+    status: 200,
+    description: 'List of assets for the current user',
+    type: AssetsResponseDto,
+  })
   async getAssets(
     @Query('page') pageRaw: string | undefined,
     @Query('pageSize') pageSizeRaw: string | undefined,
