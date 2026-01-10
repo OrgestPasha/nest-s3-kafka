@@ -1,98 +1,122 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS S3 & Kafka Microservice
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+Një mikroshërbim i specializuar për menaxhimin e skedarëve (Storage) dhe komunikimin asinkron përmes Kafka, i ndërtuar me **NestJS**. Ky shërbim ofron API për ngarkimin e aseteve në S3 (MinIO) dhe shpërndarjen e ngjarjeve në sistemin e gjerë.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Veçoritë
 
-## Description
+- **Menaxhimi i Skedarëve**: Ngarkimi i sigurt i skedarëve në MinIO (S3 Compatible Storage).
+- **Komunikimi Asinkron**: Integrim me **Kafka** për njoftimin e shërbimeve të tjera pas ngarkimit.
+- **Gjurmimi i Aseteve**: Ruajtja dhe listimi i aseteve të ngarkuara nga përdoruesit.
+- **Siguria**: Autentifikim i plotë përmes **JWT Bearer tokens**.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 🔐 Autentifikimi
 
-## Project setup
+| Lloji          | Header                          | Përdorimi                                     |
+| -------------- | ------------------------------- | --------------------------------------------- |
+| **JWT Bearer** | `Authorization: Bearer <token>` | Kërkohet për çdo kërkesë (Upload, List, etj.) |
 
-```bash
-$ npm install
-```
+## 📡 Pasqyra e Endpoint-eve
 
-## Compile and run the project
+### Skedarët (Files)
 
-```bash
-# development
-$ npm run start
+_Menaxhimi i ngarkimit fizik të skedarëve._
 
-# watch mode
-$ npm run start:dev
+- `POST /files/upload` - Ngarko një skedar të ri (Multipart/Form-Data).
+  - Parametrat: `file`, `entryId`.
 
-# production mode
-$ npm run start:prod
-```
+### Asetet (Assets)
 
-## Run tests
+_Menaxhimi i metadatave të skedarëve të ngarkuar._
+
+- `GET /assets` - Merr listën e aseteve për përdoruesin aktual.
+  - Query Params: `page`, `pageSize`.
+
+## 🛠️ Shembuj Përdorimi
+
+### Ngarkimi i një Skedari
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl -X POST "http://localhost:3000/files/upload" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+     -H "Content-Type: multipart/form-data" \
+     -F "file=@/path/to/image.png" \
+     -F "entryId=12345"
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### Listimi i Aseteve
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl -X GET "http://localhost:3000/assets?page=1&pageSize=10" \
+     -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+## 🏗️ Zhvillimi
 
-## Resources
+### Lokal
 
-Check out a few resources that may come in handy when working with NestJS:
+1. Starto shërbimet (MinIO & Kafka):
+   ```bash
+   docker compose up -d
+   ```
+2. Ekzekuto aplikacionin:
+   ```bash
+   npm run start:dev
+   ```
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Kontrolli i Cilësisë (Linting & Formatting)
 
-## Support
+```bash
+# Kontrollo për gabime (Lint)
+npm run lint
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Formato kodin (Prettier)
+npm run format
+```
 
-## Stay in touch
+---
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## ✅ Përputhshmëria me Kërkesat Teknike
 
-## License
+Ky projekt është zhvilluar në përputhje me dokumentin "Kërkesat teknike të Projektit" dhe përmbush këto aspekte kyçe:
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### 1. Arkitektura e Sistemit
+
+- **Mikroshërbime**: Projekti funksionon si një mikroshërbim i pavarur për **Storage**, i izoluar nga logika e biznesit kryesor.
+- **RESTful API**: Përdor standardet HTTP dhe JSON (`POST /files`, `GET /assets`).
+- **Modelet e Komunikimit**:
+  - **Sinkron**: HTTP REST për ngarkim dhe rikthim të të dhënave.
+  - **Asinkron**: **Kafka** (Message Queue) për njoftimin e sistemeve të tjera pas ngarkimit të skedarëve.
+- **Stateless**: Mbështetet plotësisht në `JWT` dhe nuk ruan gjendje sesioni në server.
+
+### 2. Siguria
+
+- **Autentifikimi (AuthN)**: Implementim i **JWT (JSON Web Token)** përmes `Passport` dhe `JwtStrategy`.
+- **Mbrojtja**: Përdorimi i `Guards` (`JwtAuthGuard`) për të mbrojtur endpoint-et nga qasja e paautorizuar.
+
+### 3. Performanca dhe Shkallëzueshmëria
+
+- **Asynchronous Processing**: Përdorimi i **Kafka** për të përpunuar ngjarjet në sfond, duke mos bllokuar kërkesat e përdoruesit.
+
+### 4. Dokumentimi i API-ve
+
+- **OpenAPI 3.0**: Gjenerim automatik i dokumentacionit përmes **Swagger** (`@nestjs/swagger`), i qasshëm për testim interaktiv.
+
+### 7. Integrimi me Sisteme të Jashtme
+
+- **Cloud Storage**: Integrim me **MinIO** si një zgjidhje S3-compatible object storage.
+- **Message Broker**: Përdorimi i **Kafka** për integrim me mikroshërbimet e tjera.
+
+### 8. Standardet e Kodimit
+
+- **Parimet**: Respektimi i **SOLID** dhe **Clean Architecture** falë strukturës modulare të NestJS.
+- **Linting & Formatting**: Përdorimi i **ESLint** dhe **Prettier** për cilësi dhe konsistencë kodi.
+- **Testimi**: Përfshirja e testeve të njësive (Unit Tests) dhe End-to-End (E2E) me **Jest**.
+
+### 9. Platforma dhe Teknologjitë
+
+- **Backend**: Zhvilluar me **Node.js** dhe framework-un **NestJS**.
+- **Kontejnerizimi**: Përdorimi i **Docker** për paketimin e aplikacionit dhe varësive të tij.
+
+### 10. DevOps dhe Shpërndarja
+
+- **Docker Containers**: Përdorimi i **Docker Compose** për orkestrimin lokal të aplikacionit, MinIO dhe Kafka.
