@@ -21,8 +21,8 @@ spec:
         fsGroup: 1000
       containers:
         - name: nest-s3
-          image: nest-s3:latest
-          imagePullPolicy: Never 
+          image: nest-s3:${IMAGE_TAG}
+          imagePullPolicy: IfNotPresent 
           ports:
             - containerPort: 3000
           readinessProbe:
